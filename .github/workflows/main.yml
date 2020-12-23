@@ -1,0 +1,43 @@
+# This file is distributed as a part of the polygon project (justaprudev.github.io/polygon)
+# By justaprudev
+
+name: Userbot
+on: [workflow_dispatch, push]
+
+jobs:
+  polygon:
+    runs-on: ubuntu-latest
+    name: Polygon
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Secrets
+        run: |
+          printf "
+          # All of the 'secrets' must be written to this secrets.py file during the 'Secrets' job
+          SESSION = '${{ secrets.SESSION }}'
+          APP_ID = '${{ secrets.APP_ID }}'
+          API_HASH = '${{ secrets.API_HASH }}'
+          " > secrets.py
+      - name: Run
+        timeout-minutes: 358
+        continue-on-error: true
+        uses: ./
+      - name: Loop
+        run: |
+          username=${{secrets.USERNAME}}
+          token=${{secrets.TOKEN}}
+          repo=https://$username:$token@github.com/$username/polygon.git
+          git clone "$repo" tmp
+          cd tmp
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Actions"
+          if (git log -n 1 | grep 'Polygon (')
+            then
+              git reset HEAD~1
+          fi
+          loop=$(($(<loop) + 1))
+          echo $loop > loop
+          git add loop
+          git commit -m "Polygon ($loop)"
+          git push "$repo" -f

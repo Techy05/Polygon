@@ -1,0 +1,7 @@
+# This file is distributed as a part of the polygon project (justaprudev.github.io/polygon)
+# By justaprudev
+
+name: Polygon
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
